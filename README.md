@@ -1,5 +1,5 @@
 # Bertalign
-This is a fork of bfsujason/bertalign.
+This repository is forked from the bfsujason/bertalign repo.
 
 I made following changes.
 
@@ -8,7 +8,7 @@ I made following changes.
 (3) Update the requirements.txt.
 (4) Make some minor adjustments to parameters.
 
-The original codes run on linux. For windows users, choose faiss-cpu instead of faiss-gpu-cu12 in requirements.txt. 
+The original repo run on linux. For windows users, choose faiss-cpu instead of faiss-gpu-cu12 in requirements.txt. 
 
 ## Installation
 
