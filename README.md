@@ -1,20 +1,10 @@
 # Bertalign
+This is a fork of .....
 
-An automatic mulitlingual sentence aligner.
+I made following changes.
 
-Bertalign is designed to facilitate the construction of multilingual parallel corpora and translation memories, which have a wide range of applications in translation-related research such as corpus-based translation studies, contrastive linguistics, computer-assisted translation, translator education and machine translation.
-
-## Approach
-
-Bertalign uses [sentence-transformers](https://github.com/UKPLab/sentence-transformers) to represent source and target sentences so that semantically similar sentences in different languages are mapped onto similar vector spaces. Then a two-step algorithm based on dynamic programming is performed: 1) Step 1 finds the 1-1 alignments for approximate anchor points; 2) Step 2 limits the search path to the anchor points and extracts all the valid alignments with 1-many, many-1 or many-to-many relations between the source and target sentences.
-
-## Performance
-
-According to our experiments, Bertalign achieves more accurate results on [Text+Berg](./text+berg), a publicly available German-French parallel corpus, than the traditional length-, dictionary-, or MT-based alignment methods as reported in [Thompson & Koehn (2019)](https://aclanthology.org/D19-1136/)
-
-## Languges Supported
-
-Alignment between 25 languages: Catalan (ca), Chinese (zh), Czech (cs), Danish (da), Dutch (nl), English(en), Finnish (fi), French (fr), German (de), Greek (el), Hungarian (hu), Icelandic (is), Italian (it), Lithuanian (lt), Latvain (lv), Norwegian (no), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru), Slovak (sk), Slovenian (sl), Spanish (es), Swedish (sv), and Turkish (tr).
+(1) The original code use google_tran model to detect text language, but google_tran is no longer available. Therefore I use unicode value to detect whether the string is Chinese or not.
+(2)
 
 ## Installation
 
