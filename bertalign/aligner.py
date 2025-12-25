@@ -8,7 +8,7 @@ class Bertalign:
     def __init__(self,
                  src,
                  tgt,
-                 max_align=5,
+                 max_align=8,
                  top_k=3,
                  win=5,
                  skip=-0.1,
@@ -71,6 +71,9 @@ class Bertalign:
         first_w, first_path = find_first_search_path(self.src_num, self.tgt_num)
         first_pointers = first_pass_align(self.src_num, self.tgt_num, first_w, first_path, first_alignment_types, D, I)
         first_alignment = first_back_track(self.src_num, self.tgt_num, first_pointers, first_path, first_alignment_types)
+        #print(first_alignment)
+        #for xx in (first_alignment):
+            #print(self.src_sents[xx[0]-1]+ self.tgt_sents[xx[1]-1])
         
         print("Performing second-step alignment ...")
         second_alignment_types = get_alignment_types(self.max_align)

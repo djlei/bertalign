@@ -1,35 +1,49 @@
 import re
-from googletrans import Translator
+#from googletrans import Translator
 from sentence_splitter import SentenceSplitter
 
 def clean_text(text):
+    text= re.sub(r'(\s+[A-Za-z]+\.)\d+(\s|$)', r'\1\2', text)
     clean_text = []
     text = text.strip()
     lines = text.splitlines()
     for line in lines:
         line = line.strip()
         if line:
-            line = re.sub('\s+', ' ', line)
+            line = re.sub(r'\s+', ' ', line)
             clean_text.append(line)
     return "\n".join(clean_text)
     
-def detect_lang(text):
-    translator = Translator(service_urls=[
-      'translate.google.com.hk',
-    ])
-    max_len = 200
-    chunk = text[0 : min(max_len, len(text))]
-    lang = translator.detect(chunk).lang
-    if lang.startswith('zh'):
-        lang = 'zh'
-    return lang
 
+def detect_lang(text: str, threshold: float = 0.7) -> str:
+    """
+    Robust offline language detector for zh vs non-zh.
+    A text is regarded as Chinese only if >= threshold of characters are Chinese.
+    """
+    if not text:
+        return "en"
+
+    # Count Chinese characters
+    chinese_chars = re.findall(r"[\u4e00-\u9fff]", text)
+    chinese_count = len(chinese_chars)
+
+    # Count all non-whitespace characters
+    total_chars = len(re.findall(r"\S", text))
+
+    if total_chars == 0:
+        return "en"
+
+    if chinese_count / total_chars >= threshold:
+        return "zh"
+    return "en"
+
+    
 def split_sents(text, lang):
     if lang in LANG.SPLITTER:
         if lang == 'zh':
             sents = _split_zh(text)
         else:
-            splitter = SentenceSplitter(language=lang)
+            splitter = SentenceSplitter(language=lang)            
             sents = splitter.split(text=text) 
             sents = [sent.strip() for sent in sents]
         return sents
@@ -38,8 +52,8 @@ def split_sents(text, lang):
     
 def _split_zh(text, limit=1000):
         sent_list = []
-        text = re.sub('(?P<quotation_mark>([。？！](?![”’"\'）])))', r'\g<quotation_mark>\n', text)
-        text = re.sub('(?P<quotation_mark>([。？！]|…{1,2})[”’"\'）])', r'\g<quotation_mark>\n', text)
+        text = re.sub('(?P<quotation_mark>([。?？!！](?![”’"\'）])))', r'\g<quotation_mark>\n', text)
+        text = re.sub('(?P<quotation_mark>([。?？!！]|…{1,2})[”’"\'）])', r'\g<quotation_mark>\n', text)
 
         sent_list_ori = text.splitlines()
         for sent in sent_list_ori:
@@ -62,6 +76,25 @@ def yield_overlaps(lines, num_overlaps):
             # check must be here so all outputs are unique
             out_line2 = out_line[:10000]  # limit line so dont encode arbitrarily long sentences
             yield out_line2
+
+def lengths_for_overlaps(sents, num_overlaps: int):
+    """
+    Length signal for each overlap segment.
+    IMPORTANT: padded/invalid positions must NOT be 0, otherwise second-pass DP can divide by zero.
+    We use 1.0 as the safe neutral minimum.
+    Returns lens: shape (num_overlaps, N)
+    """
+    n = len(sents)
+    # Fill everything with 1.0 (safe nonzero default)
+    lens = [[1.0] * n for _ in range(num_overlaps)]
+
+    for o in range(1, num_overlaps + 1):
+        for i in range(0, n - o + 1):
+            seg = "".join(sents[i : i + o])
+            seg = re.sub(r"\s+", "", seg)
+            lens[o - 1][i] = float(max(len(seg), 1))  # always >= 1
+
+    return lens
 
 def _layer(lines, num_overlaps, comb=' '):
     if num_overlaps < 1:
