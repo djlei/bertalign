@@ -6,7 +6,7 @@ I made following changes.
 (1) The original code use google_tran model to detect text language, but google_tran is no longer available. Therefore I use unicode value to detect whether the text is Chinese or not.
 (2) Change the default model to BAAI/bge-m3.
 (3) Update the requirements.txt.
-(4) Make some minor adjustments to parameters.
+(4) Make some minor adjustments.
 
 The original repo run on linux. For windows users, choose faiss-cpu instead of faiss-gpu-cu12 in requirements.txt. 
 
